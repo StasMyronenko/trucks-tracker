@@ -15,6 +15,7 @@ const dimensions = mongoose.Schema({
 
 const log = mongoose.Schema({
   message: {
+    default: '',
     type: String,
   },
   time: {
@@ -34,6 +35,7 @@ const Load = mongoose.model('Load', {
   status: {
     type: String,
     enum: STATUS,
+    default: 'NEW',
   },
   state: {
     type: String,

@@ -42,12 +42,8 @@ const addLoad = async (req, res, next) => {
     payload: req.body.payload,
     pickup_address: req.body.pickup_address,
     delivery_address: req.body.delivery_address,
-    dimensions: {
-      width: req.body.width,
-      length: req.body.length,
-      height: req.body.height,
-    },
-
+    dimensions: req.body.dimensions,
+    created_date: (new Date()).toString(),
   });
   await load.save();
   res.status(200).json({ message: 'Load created successfully' });
@@ -121,18 +117,40 @@ const deleteLoadById = async (req, res, next) => {
 };
 
 const findDriver = async (req, res, next) => {
-  const truck = await Truck.findOne({ status: 'IS' });
-  truck.status = 'OL';
   const load = await Load.findOne({ _id: req.params.id });
-  // eslint-disable-next-line no-underscore-dangle
-  load.assigned_to = truck._id;
-  truck.save();
-  load.save();
-  res.status(200).json({
-    message: 'Load posted successfully',
-    driver_found: true,
-  });
-  next();
+  load.status = 'POSTED';
+  await load.save();
+  const truck = await Truck.aggregate([
+    {
+      $match: {
+        status: 'IS',
+        width: { $lse: load.dimensions.width },
+        length: { $lse: load.dimensions.length },
+        height: { $lse: load.dimensions.height },
+      },
+      $limit: 1,
+    },
+  ]);
+  if (truck) {
+    truck.status = 'OL';
+    // eslint-disable-next-line no-underscore-dangle
+    load.assigned_to = truck._id;
+    load.STAUS = 'ASSIGNED';
+    truck.save();
+    load.save();
+    res.status(200).json({
+      message: 'Load posted successfully',
+      driver_found: true,
+    });
+    next();
+  } else {
+    load.logs.append({ message: 'Driver was not find', time: (new Date()).toString() });
+    load.save();
+    res.status(200).json({
+      message: 'Driver was not find',
+      driver_found: false,
+    });
+  }
 };
 
 const allInfoLoad = async (req, res, next) => {
