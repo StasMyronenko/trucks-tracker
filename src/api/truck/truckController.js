@@ -64,7 +64,7 @@ const deleteTruckById = async (req, res, next) => {
     res.status(200).json({ message: 'Truck deleted successfully' });
     next();
   } catch (err) {
-    res.status(400).json({ message: `Error^ ${err}` });
+    res.status(400).json({ message: `Error: ${err}` });
   }
 };
 

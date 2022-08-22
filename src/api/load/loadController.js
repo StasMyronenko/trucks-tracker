@@ -37,14 +37,19 @@ const getLoads = async (req, res, next) => {
   }
 };
 
-const addLoad = async (req, res, next) => {
+const createLoad = async (req, res, next) => {
   const load = new Load({
+    // eslint-disable-next-line no-underscore-dangle
+    created_by: req.user._id,
+    status: 'NEW',
+    state: null,
     name: req.body.name,
     payload: req.body.payload,
     pickup_address: req.body.pickup_address,
     delivery_address: req.body.delivery_address,
     dimensions: req.body.dimensions,
     created_date: (new Date()).toString(),
+    logs: [{ message: 'Load was created', time: (new Date()).toString() }],
   });
   await load.save();
   res.status(200).json({ message: 'Load created successfully' });
@@ -61,7 +66,14 @@ const getActiveLoad = async (req, res, next) => {
 const newState = async (req, res, next) => {
   // eslint-disable-next-line no-underscore-dangle
   const load = await Load.findOne({ assigned_to: req.user._id });
-  load.state = STATE[STATE.indexOf(load.state) + 1];
+  const index = STATE.indexOf(load.state);
+  if (index === 2) {
+    load.status = 'SHIPPED';
+  }
+  if (index <= 2) {
+    load.state = STATE[index + 1];
+  }
+
   await load.save();
   res.status(200).json({ message: load.state });
   next();
@@ -73,7 +85,13 @@ const getLoadById = async (req, res, next) => {
 };
 
 const updateLoadById = async (req, res, next) => {
-  const load = Load.findOne({ _id: req.params.id });
+  // eslint-disable-next-line no-underscore-dangle
+  const load = Load.findOne({ created_by: req.user._id, _id: req.params.id, status: 'NEW' });
+
+  if (!load) {
+    res.status(400).json({ message: 'Not Found' });
+    return;
+  }
   if (req.body.name) {
     load.name = req.body.name;
   }
@@ -112,12 +130,12 @@ const updateLoadById = async (req, res, next) => {
 
 const deleteLoadById = async (req, res, next) => {
   // eslint-disable-next-line no-underscore-dangle
-  await Load.findOneAndDelete({ _id: req.user._id });
+  await Load.findOneAndDelete({ created_by: req.user._id, _id: req.params.id, status: 'NEW' });
   res.status(200).json({ message: 'Load deleted successfully' });
   next();
 };
 
-const findDriver = async (req, res, next) => {
+const postLoad = async (req, res, next) => {
   const load = await Load.findOne({ _id: req.params.id });
   load.status = 'POSTED';
   await load.save();
@@ -172,12 +190,12 @@ const allInfoLoad = async (req, res, next) => {
 
 module.exports = {
   getLoads,
-  addLoad,
+  createLoad,
   getActiveLoad,
   newState,
   getLoadById,
   updateLoadById,
   deleteLoadById,
-  findDriver,
+  postLoad,
   allInfoLoad,
 };

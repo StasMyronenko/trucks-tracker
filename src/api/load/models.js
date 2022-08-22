@@ -31,6 +31,7 @@ const Load = mongoose.model('Load', {
   assigned_to: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
+    default: null,
   },
   status: {
     type: String,

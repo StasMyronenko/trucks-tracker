@@ -1,13 +1,13 @@
 const express = require('express');
 const {
   getLoads,
-  addLoad,
+  createLoad,
   getActiveLoad,
   newState,
   getLoadById,
   updateLoadById,
   deleteLoadById,
-  findDriver,
+  postLoad,
   allInfoLoad,
 } = require('./loadController');
 const { isShipper } = require('../../middlewares/isShipperMeddleware');
@@ -17,11 +17,11 @@ const router = express.Router();
 
 router.get('/', getLoads);
 
-router.post('/', isShipper, addLoad);
+router.post('/', isShipper, createLoad);
 
 router.get('/active', isDriver, getActiveLoad);
 
-router.patch('/active', isDriver, newState);
+router.patch('/active/state', isDriver, newState);
 
 router.patch('/:id', isDriver, getLoadById);
 
@@ -29,7 +29,7 @@ router.put('/:id', updateLoadById);
 
 router.delete('/:id', deleteLoadById);
 
-router.post('/:id/post', findDriver);
+router.post('/:id/post', postLoad);
 
 router.get('/:id/shipping_info', allInfoLoad);
 
