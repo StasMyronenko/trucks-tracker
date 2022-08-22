@@ -18,6 +18,7 @@ const addTruck = async (req, res, next) => {
       assigned_to: null,
       type: req.body.type,
       created_date: (new Date()).toString(),
+
     });
     truck.save();
     await res.status(200).json({

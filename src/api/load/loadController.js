@@ -1,6 +1,7 @@
 const { Load } = require('./models');
 const { STATE } = require('../../data/load');
 const { Truck } = require('../truck/models');
+const { SIZE } = require('../../data/truck');
 
 const getLoads = async (req, res, next) => {
   const status = req.query.status || undefined;
@@ -120,13 +121,22 @@ const findDriver = async (req, res, next) => {
   const load = await Load.findOne({ _id: req.params.id });
   load.status = 'POSTED';
   await load.save();
+  const types = [];
+  // eslint-disable-next-line no-restricted-syntax
+  for (const type in SIZE) {
+    if (SIZE[type].width >= load.dimensions.width
+      && SIZE[type].length >= load.dimensions.length
+      && SIZE[type].height >= load.dimensions.height) {
+      types.push();
+    }
+  }
   const truck = await Truck.aggregate([
     {
       $match: {
         status: 'IS',
-        width: { $lse: load.dimensions.width },
-        length: { $lse: load.dimensions.length },
-        height: { $lse: load.dimensions.height },
+        type: {
+          $in: [...types],
+        },
       },
       $limit: 1,
     },
