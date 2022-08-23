@@ -4,7 +4,7 @@ const getTrucks = async (req, res, next) => {
   // eslint-disable-next-line no-underscore-dangle
   const trucks = await Truck.find({ created_by: req.user._id }).all();
   try {
-    res.status(200).json({ trucks });
+    res.status(200).json({ trucks: [...trucks] });
     next();
   } catch (err) {
     res.status(400).json({ message: `Error^ ${err}` });
