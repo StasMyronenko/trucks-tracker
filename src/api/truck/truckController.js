@@ -1,7 +1,8 @@
 const { Truck } = require('./models');
 
 const getTrucks = async (req, res, next) => {
-  const trucks = await Truck.find({}).all();
+  // eslint-disable-next-line no-underscore-dangle
+  const trucks = await Truck.find({ created_by: req.user._id }).all();
   try {
     res.status(200).json({ trucks });
     next();
