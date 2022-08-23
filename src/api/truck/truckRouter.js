@@ -1,11 +1,11 @@
 const express = require('express');
 const {
-  addTruck, getTrucks, getTruckById, updateTruckById, deleteTruckById, assignTruckById,
+  addTruck, getUserTrucks, getTruckById, updateTruckById, deleteTruckById, assignTruckById,
 } = require('./truckController');
 
 const router = express.Router();
 
-router.get('/', getTrucks);
+router.get('/', getUserTrucks);
 
 router.post('/', addTruck);
 
