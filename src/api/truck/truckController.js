@@ -1,9 +1,9 @@
 const { Truck } = require('./models');
 
 const getTrucks = async (req, res, next) => {
-  const trucks = await Truck.find().all();
+  const trucks = await Truck.find({}).all();
   try {
-    res.status(200).json(trucks);
+    res.status(200).json({ trucks });
     next();
   } catch (err) {
     res.status(400).json({ message: `Error^ ${err}` });
