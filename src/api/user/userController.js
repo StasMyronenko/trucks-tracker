@@ -24,11 +24,12 @@ const deleteProfile = async (req, res, next) => {
 const changePassword = async (req, res, next) => {
   const user = await User.findOne({ email: req.user.email });
   if (user && await bcrypt.compare(String(req.body.oldPassword), String(user.password))) {
-    User.password = await bcrypt.hash(req.body.newPassword, 10);
+    user.password = await bcrypt.hash(req.body.newPassword, 10);
+    await user.save();
     res.status(200).json({ message: 'Password changed successfully' });
     next();
   } else {
-    res.status(200).json({ message: 'Invalid Password' });
+    res.status(400).json({ message: 'Invalid Password' });
   }
 };
 

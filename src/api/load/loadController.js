@@ -58,7 +58,9 @@ const createLoad = async (req, res, next) => {
 
 const getActiveLoad = async (req, res, next) => {
   // eslint-disable-next-line no-underscore-dangle
-  const load = await Load.findOne({ assigned_to: req.user._id });
+  const truck = await Truck.findOne({ assigned_to: req.user._id });
+  // eslint-disable-next-line no-underscore-dangle
+  const load = await Load.findOne({ assigned_to: truck._id });
   res.status(200).json({ load });
   next();
 };
