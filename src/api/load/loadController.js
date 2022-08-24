@@ -60,17 +60,18 @@ const getActiveLoad = async (req, res, next) => {
   // eslint-disable-next-line no-underscore-dangle
   const truck = await Truck.findOne({ assigned_to: req.user._id });
   // eslint-disable-next-line no-underscore-dangle
-  const load = await Load.findOne({ assigned_to: truck._id });
+  const load = await Load.findOne({ assigned_to: truck._id, status: 'ASSIGNED' });
   res.status(200).json({ load });
   next();
 };
 
 const newState = async (req, res, next) => {
   // eslint-disable-next-line no-underscore-dangle
-  const load = await Load.findOne({ assigned_to: req.user._id });
+  const load = await Load.findOne({ assigned_to: req.user._id, status: 'ASSIGNED' });
   const index = STATE.indexOf(load.state);
   if (index === 2) {
     load.status = 'SHIPPED';
+    load.state = null;
   }
   if (index <= 2) {
     load.state = STATE[index + 1];
@@ -88,12 +89,13 @@ const getLoadById = async (req, res, next) => {
 
 const updateLoadById = async (req, res, next) => {
   // eslint-disable-next-line no-underscore-dangle
-  const load = Load.findOne({ created_by: req.user._id, _id: req.params.id, status: 'NEW' });
+  const load = await Load.findOne({ created_by: req.user._id, _id: req.params.id, status: 'NEW' });
 
   if (!load) {
     res.status(400).json({ message: 'Not Found' });
     return;
   }
+
   if (req.body.name) {
     load.name = req.body.name;
   }
@@ -147,10 +149,10 @@ const postLoad = async (req, res, next) => {
     if (SIZE[type].width >= load.dimensions.width
       && SIZE[type].length >= load.dimensions.length
       && SIZE[type].height >= load.dimensions.height) {
-      types.push();
+      types.push(type);
     }
   }
-  const truck = await Truck.aggregate([
+  const trucks = await Truck.aggregate([
     {
       $match: {
         status: 'IS',
@@ -158,9 +160,14 @@ const postLoad = async (req, res, next) => {
           $in: [...types],
         },
       },
+    },
+    {
       $limit: 1,
     },
   ]);
+  // eslint-disable-next-line no-underscore-dangle
+  const truck = await Truck.findById(trucks[0]._id); // strange
+  console.log(truck);
   if (truck) {
     truck.status = 'OL';
     // eslint-disable-next-line no-underscore-dangle

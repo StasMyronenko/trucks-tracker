@@ -24,8 +24,15 @@ app.use(morgan('tiny'));
 
 app.use('/api', apiRouter);
 
-// eslint-disable-next-line no-undef
-app.listen(process.env.PORT);
+const start = async () => {
+  try {
+    app.listen(process.env.PORT);
+  } catch (err) {
+    console.error(`Error on server startup: ${err.message}`);
+  }
+};
+
+start();
 
 function errorHandler(err, req, res, next) {
   res.status(500).send({ message: `Server error: ${err}` });

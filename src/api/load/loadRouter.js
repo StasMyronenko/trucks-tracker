@@ -23,7 +23,7 @@ router.get('/active', isDriver, getActiveLoad);
 
 router.patch('/active/state', isDriver, newState);
 
-router.patch('/:id', isDriver, getLoadById);
+router.get('/:id', getLoadById);
 
 router.put('/:id', updateLoadById);
 

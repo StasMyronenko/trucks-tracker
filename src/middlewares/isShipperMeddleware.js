@@ -5,7 +5,7 @@ const isShipper = async (req, res, next) => {
   if (user && user.role === 'SHIPPER') {
     next();
   } else {
-    res.status(400).json({ message: 'You are not driver or not authenticated' });
+    res.status(400).json({ message: 'You are not shipper or not authenticated' });
   }
 };
 

@@ -34,8 +34,9 @@ const addTruck = async (req, res, next) => {
 };
 
 const getTruckById = async (req, res, next) => {
-  const truck = await Truck.findById(req.params.id);
+
   try {
+    const truck = await Truck.findById(req.params.id);
     res.status(200).json(truck);
     next();
   } catch (err) {
@@ -44,8 +45,8 @@ const getTruckById = async (req, res, next) => {
 };
 
 const updateTruckById = async (req, res, next) => {
-  const truck = await Truck.findById(req.params.id);
   try {
+    const truck = await Truck.findById(req.params.id);
     truck.type = req.body.type;
     truck.save();
     await res.status(200).json({
@@ -60,8 +61,8 @@ const updateTruckById = async (req, res, next) => {
 };
 
 const deleteTruckById = async (req, res, next) => {
-  await Truck.findByIdAndDelete(req.params.id);
   try {
+    await Truck.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: 'Truck deleted successfully' });
     next();
   } catch (err) {
