@@ -30,7 +30,7 @@ const getLoads = async (req, res, next) => {
   // .$skip(offset)
   // .$limit(limit);
   try {
-    res.status(200).json(loads);
+    res.status(200).json({ loads });
     next();
   } catch (err) {
     res.status(400).json({ message: `Error ${err.message}` });
@@ -76,7 +76,7 @@ const newState = async (req, res, next) => {
   const load = await Load.findOne({ assigned_to: truck._id, status: 'ASSIGNED' });
   let index;
   if (!load) {
-    res.status(400).json({ message: 'Incorrect data. Might be load already shipped or you don\'t have active loads'});
+    res.status(400).json({ message: 'Incorrect data. Might be load already shipped or you don\'t have active loads' });
     return;
   }
   if (load.state) {
