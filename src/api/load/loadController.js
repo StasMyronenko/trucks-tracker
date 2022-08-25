@@ -8,7 +8,6 @@ const getLoads = async (req, res, next) => {
   const limit = req.query.status || 10;
   const offset = req.query.status || 0;
 
-  // eslint-disable-next-line no-underscore-dangle
   const loads = await Load.aggregate([
     {
       $match: {
@@ -24,11 +23,6 @@ const getLoads = async (req, res, next) => {
     { $skip: offset },
     { $limit: limit },
   ]);
-  // eslint-disable-next-line no-underscore-dangle
-  //   .aggregate().$or()
-  //   .$sort({ status });
-  // .$skip(offset)
-  // .$limit(limit);
   try {
     res.status(200).json({ loads });
     next();
