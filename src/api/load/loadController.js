@@ -67,8 +67,19 @@ const getActiveLoad = async (req, res, next) => {
 
 const newState = async (req, res, next) => {
   // eslint-disable-next-line no-underscore-dangle
-  const load = await Load.findOne({ assigned_to: req.user._id, status: 'ASSIGNED' });
-  const index = STATE.indexOf(load.state);
+  const truck = await Truck.findOne({ assigned_to: req.user._id });
+  // eslint-disable-next-line no-underscore-dangle
+  const load = await Load.findOne({ assigned_to: truck._id, status: 'ASSIGNED' });
+  let index;
+  if (!load) {
+    res.status(400).json({ message: 'Incorrect data. Might be load already shipped or you don\'t have active loads'});
+    return;
+  }
+  if (load.state) {
+    index = STATE.indexOf(load.state);
+  } else {
+    index = -1;
+  }
   if (index === 2) {
     load.status = 'SHIPPED';
     load.state = null;
@@ -165,23 +176,33 @@ const postLoad = async (req, res, next) => {
       $limit: 1,
     },
   ]);
-  // eslint-disable-next-line no-underscore-dangle
-  const truck = await Truck.findById(trucks[0]._id); // strange
-  console.log(truck);
-  if (truck) {
-    truck.status = 'OL';
+
+  if (trucks.length > 0) {
     // eslint-disable-next-line no-underscore-dangle
-    load.assigned_to = truck._id;
-    load.STAUS = 'ASSIGNED';
-    truck.save();
-    load.save();
-    res.status(200).json({
-      message: 'Load posted successfully',
-      driver_found: true,
-    });
-    next();
+    const truck = await Truck.findById(trucks[0]._id); // strange
+    if (truck.assigned_to) {
+      truck.status = 'OL';
+      // eslint-disable-next-line no-underscore-dangle
+      load.assigned_to = truck._id;
+      load.status = 'ASSIGNED';
+      load.state = 'En route to Pick Up';
+      await truck.save();
+      await load.save();
+      await res.status(200).json({
+        message: 'Load posted successfully',
+        driver_found: true,
+      });
+      next();
+    } else {
+      load.logs.push({ message: 'Driver was not find', time: (new Date()).toString() });
+      load.save();
+      res.status(200).json({
+        message: 'Driver was not find',
+        driver_found: false,
+      });
+    }
   } else {
-    load.logs.append({ message: 'Driver was not find', time: (new Date()).toString() });
+    load.logs.push({ message: 'Driver was not find', time: (new Date()).toString() });
     load.save();
     res.status(200).json({
       message: 'Driver was not find',
