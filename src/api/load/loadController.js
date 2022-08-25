@@ -56,13 +56,17 @@ const createLoad = async (req, res, next) => {
   next();
 };
 
-const getActiveLoad = async (req, res, next) => {
-  // eslint-disable-next-line no-underscore-dangle
-  const truck = await Truck.findOne({ assigned_to: req.user._id });
-  // eslint-disable-next-line no-underscore-dangle
-  const load = await Load.findOne({ assigned_to: truck._id, status: 'ASSIGNED' });
-  res.status(200).json({ load });
-  next();
+const getActiveLoad = async (req, res) => {
+  // When I use next it will  be error.
+  try {
+    // eslint-disable-next-line no-underscore-dangle
+    const truck = await Truck.findOne({ assigned_to: req.user._id });
+    // eslint-disable-next-line no-underscore-dangle
+    const load = await Load.findOne({ assigned_to: truck._id, status: 'ASSIGNED' });
+    await res.status(200).json({ load });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
 };
 
 const newState = async (req, res, next) => {
