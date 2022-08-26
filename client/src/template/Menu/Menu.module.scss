@@ -1,0 +1,21 @@
+a {
+  text-decoration: none;
+  color: black;
+  font-size: 2em;
+}
+
+a:hover {
+  color: grey;
+}
+
+.menu{
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 50px;
+}
+
+@media screen and (max-width: 400px) {
+  a {
+    font-size: 1em;
+  }
+}

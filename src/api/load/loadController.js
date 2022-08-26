@@ -1,23 +1,28 @@
 const { Load } = require('./models');
-const { STATE } = require('../../data/load');
+const { STATE, STATUS } = require('../../data/load');
 const { Truck } = require('../truck/models');
 const { SIZE } = require('../../data/truck');
 
 const getLoads = async (req, res, next) => {
   const status = req.query.status || undefined;
-  const limit = req.query.status || 10;
-  const offset = req.query.status || 0;
-
+  const limit = Number(req.query.limit) || 10;
+  const offset = Number(req.query.offset) || 0;
+  // eslint-disable-next-line no-underscore-dangle
+  const truck = await Truck.findOne({ assigned_to: req.user._id });
   const loads = await Load.aggregate([
     {
       $match: {
         $or: [
           // eslint-disable-next-line no-underscore-dangle
-          { assigned_to: req.user._id },
+          { assigned_to: truck?._id },
           // eslint-disable-next-line no-underscore-dangle
           { created_by: req.user._id },
-          (status) ? { status } : { undefined },
         ],
+      },
+    },
+    {
+      $match: {
+        status: { $in: status ? [status] : [...STATUS] },
       },
     },
     { $skip: offset },

@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { User } = require('../user/models');
+const { sendEmailRestorePassword } = require('../../emailer/emailer');
 
 async function registerUser(req, res, next) {
   const { role, email, password } = req.body;
@@ -41,11 +42,30 @@ async function loginUser(req, res, next) {
 }
 
 async function forgotPassword(req, res, next) {
-  next();
+  try {
+    await sendEmailRestorePassword(req.body.email);
+    res.status(200).json({ message: 'We send message on your email' });
+    next();
+  } catch (err) {
+    res.status(400).json({ message: `Error ${err.message}` });
+  }
 }
+
+const restorePassword = async (req, res, next) => {
+  try {
+    const user = await User.findOne({ email: req.params.email });
+    user.password = await bcrypt.hash(req.body.newPassword, 10);
+    await user.save();
+    res.status(200).json({ message: 'Password saved' });
+    next();
+  } catch (err) {
+    res.status(400).json({ message: `Error ${err.message}` });
+  }
+};
 
 module.exports = {
   registerUser,
   loginUser,
   forgotPassword,
+  restorePassword,
 };

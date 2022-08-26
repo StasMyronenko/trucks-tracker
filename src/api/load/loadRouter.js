@@ -25,13 +25,13 @@ router.patch('/active/state', isDriver, newState);
 
 router.get('/:id', getLoadById);
 
-router.put('/:id', updateLoadById);
+router.put('/:id', isShipper, updateLoadById);
 
-router.delete('/:id', deleteLoadById);
+router.delete('/:id', isShipper, deleteLoadById);
 
-router.post('/:id/post', postLoad);
+router.post('/:id/post', isShipper, postLoad);
 
-router.get('/:id/shipping_info', allInfoLoad);
+router.get('/:id/shipping_info', isShipper, allInfoLoad);
 
 module.exports = {
   loadRouter: router,
