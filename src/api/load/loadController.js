@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const { Load } = require('./models');
 const { STATE, STATUS } = require('../../data/load');
 const { Truck } = require('../truck/models');
@@ -14,9 +15,9 @@ const getLoads = async (req, res, next) => {
       $match: {
         $or: [
           // eslint-disable-next-line no-underscore-dangle
-          { assigned_to: truck?._id },
+          { created_by: mongoose.Types.ObjectId(req.user._id) },
           // eslint-disable-next-line no-underscore-dangle
-          { created_by: req.user._id },
+          { assigned_to: mongoose.Types.ObjectId(truck?._id) },
         ],
       },
     },
