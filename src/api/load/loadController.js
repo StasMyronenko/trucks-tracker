@@ -30,10 +30,10 @@ const getLoads = async (req, res, next) => {
     { $limit: limit },
   ]);
   try {
-    res.status(200).json({ loads });
+    await res.status(200).json({ loads });
     next();
   } catch (err) {
-    res.status(400).json({ message: `Error ${err.message}` });
+    await res.status(400).json({ message: `Error ${err.message}` });
   }
 };
 
@@ -52,7 +52,7 @@ const createLoad = async (req, res, next) => {
     logs: [{ message: 'Load was created', time: (new Date()).toString() }],
   });
   await load.save();
-  res.status(200).json({ message: 'Load created successfully' });
+  await res.status(200).json({ message: 'Load created successfully' });
   next();
 };
 
@@ -65,7 +65,7 @@ const getActiveLoad = async (req, res) => {
     const load = await Load.findOne({ assigned_to: truck._id, status: 'ASSIGNED' });
     await res.status(200).json({ load });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    await res.status(400).json({ message: err.message });
   }
 };
 
@@ -76,7 +76,7 @@ const newState = async (req, res, next) => {
   const load = await Load.findOne({ assigned_to: truck._id, status: 'ASSIGNED' });
   let index;
   if (!load) {
-    res.status(400).json({ message: 'Incorrect data. Might be load already shipped or you don\'t have active loads' });
+    await res.status(400).json({ message: 'Incorrect data. Might be load already shipped or you don\'t have active loads' });
     return;
   }
   if (load.state) {
@@ -93,7 +93,7 @@ const newState = async (req, res, next) => {
   }
 
   await load.save();
-  res.status(200).json({ message: load.state });
+  await res.status(200).json({ message: load.state });
   next();
 };
 
@@ -107,7 +107,7 @@ const updateLoadById = async (req, res, next) => {
   const load = await Load.findOne({ created_by: req.user._id, _id: req.params.id, status: 'NEW' });
 
   if (!load) {
-    res.status(400).json({ message: 'Not Found' });
+    await res.status(400).json({ message: 'Not Found' });
     return;
   }
 
@@ -141,7 +141,7 @@ const updateLoadById = async (req, res, next) => {
 
   await load.save();
 
-  res.status(200).json({
+  await res.status(200).json({
     message: 'Load details changed successfully',
   });
   next();
@@ -150,7 +150,7 @@ const updateLoadById = async (req, res, next) => {
 const deleteLoadById = async (req, res, next) => {
   // eslint-disable-next-line no-underscore-dangle
   await Load.findOneAndDelete({ created_by: req.user._id, _id: req.params.id, status: 'NEW' });
-  res.status(200).json({ message: 'Load deleted successfully' });
+  await res.status(200).json({ message: 'Load deleted successfully' });
   next();
 };
 
@@ -199,16 +199,16 @@ const postLoad = async (req, res, next) => {
       next();
     } else {
       load.logs.push({ message: 'Driver was not find', time: (new Date()).toString() });
-      load.save();
-      res.status(200).json({
+      await load.save();
+      await res.status(200).json({
         message: 'Driver was not find',
         driver_found: false,
       });
     }
   } else {
     load.logs.push({ message: 'Driver was not find', time: (new Date()).toString() });
-    load.save();
-    res.status(200).json({
+    await load.save();
+    await res.status(200).json({
       message: 'Driver was not find',
       driver_found: false,
     });
@@ -218,7 +218,7 @@ const postLoad = async (req, res, next) => {
 const allInfoLoad = async (req, res, next) => {
   const load = await Load.findById(req.params.id);
   const truck = await Truck.findById(load.assigned_to);
-  res.status(200).json({ load, truck });
+  await res.status(200).json({ load, truck });
   next();
 };
 

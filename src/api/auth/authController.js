@@ -31,23 +31,23 @@ async function loginUser(req, res, next) {
     };
     // eslint-disable-next-line no-undef
     const jwtToken = jwt.sign(payload, process.env.SECRET_KEY);
-    res.status(200).json({
+    await res.status(200).json({
       message: 'Success',
       jwt_token: jwtToken,
     });
     next();
     return;
   }
-  res.status(400).json({ message: 'Invalid password or login' });
+  await res.status(400).json({ message: 'Invalid password or login' });
 }
 
 async function forgotPassword(req, res, next) {
   try {
     await sendEmailRestorePassword(req.body.email);
-    res.status(200).json({ message: 'We send message on your email' });
+    await res.status(200).json({ message: 'We send message on your email' });
     next();
   } catch (err) {
-    res.status(400).json({ message: `Error ${err.message}` });
+    await res.status(400).json({ message: `Error ${err.message}` });
   }
 }
 
@@ -56,10 +56,10 @@ const restorePassword = async (req, res, next) => {
     const user = await User.findOne({ email: req.params.email });
     user.password = await bcrypt.hash(req.body.newPassword, 10);
     await user.save();
-    res.status(200).json({ message: 'Password saved' });
+    await res.status(200).json({ message: 'Password saved' });
     next();
   } catch (err) {
-    res.status(400).json({ message: `Error ${err.message}` });
+    await res.status(400).json({ message: `Error ${err.message}` });
   }
 };
 

@@ -7,17 +7,17 @@ const getUsersProfile = async (req, res, next) => {
     await res.status(200).json({ user });
     next();
   } else {
-    res.status(400).json({ message: 'Server Error' });
+    await res.status(400).json({ message: 'Server Error' });
   }
 };
 
 const deleteProfile = async (req, res, next) => {
   const user = await User.findOneAndDelete({ email: req.user.email });
   if (user) {
-    res.status(200).json({ message: 'Success' });
+    await res.status(200).json({ message: 'Success' });
     next();
   } else {
-    res.status(400).json({ message: 'Error' });
+    await res.status(400).json({ message: 'Error' });
   }
 };
 
@@ -26,10 +26,10 @@ const changePassword = async (req, res, next) => {
   if (user && await bcrypt.compare(String(req.body.oldPassword), String(user.password))) {
     user.password = await bcrypt.hash(req.body.newPassword, 10);
     await user.save();
-    res.status(200).json({ message: 'Password changed successfully' });
+    await res.status(200).json({ message: 'Password changed successfully' });
     next();
   } else {
-    res.status(400).json({ message: 'Invalid Password' });
+    await res.status(400).json({ message: 'Invalid Password' });
   }
 };
 
