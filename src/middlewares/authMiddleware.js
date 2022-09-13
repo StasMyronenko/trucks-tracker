@@ -1,14 +1,14 @@
 const jwt = require('jsonwebtoken');
 
-const authMiddleware = (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
   const { authorization } = req.headers;
   if (!authorization) {
-    res.status(400).json({ message: 'Not authenticate' });
+    await res.status(400).json({ message: 'Not authenticate' });
     return;
   }
   const [, token] = authorization.split(' ');
   if (!token) {
-    res.status(400).json({ message: 'Not authenticate' });
+    await res.status(400).json({ message: 'Not authenticate' });
     return;
   }
   try {
@@ -19,9 +19,9 @@ const authMiddleware = (req, res, next) => {
       _id: tokenPayload._id,
       email: tokenPayload.email,
     };
-    next();
+    await next();
   } catch (err) {
-    res.status(400).json({ message: 'Token error' });
+    await res.status(400).json({ message: 'Token error' });
   }
 };
 module.exports = {

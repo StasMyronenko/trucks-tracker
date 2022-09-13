@@ -5,7 +5,7 @@ const getUserTrucks = async (req, res, next) => {
   const trucks = await Truck.find({ created_by: req.user._id }).all();
   try {
     await res.status(200).json({ trucks });
-    next();
+    await next();
   } catch (err) {
     await res.status(400).json({ message: `Error^ ${err}` });
   }
@@ -25,7 +25,7 @@ const addTruck = async (req, res, next) => {
     await res.status(200).json({
       message: 'Truck created successfully',
     });
-    next();
+    await next();
   } catch (err) {
     await res.status(400).json({
       message: `Error: ${err.message}`,
@@ -37,7 +37,7 @@ const getTruckById = async (req, res, next) => {
   try {
     const truck = await Truck.findById(req.params.id);
     await res.status(200).json(truck);
-    next();
+    await next();
   } catch (err) {
     await res.status(400).json({ message: `Error^ ${err}` });
   }
@@ -51,7 +51,7 @@ const updateTruckById = async (req, res, next) => {
     await res.status(200).json({
       message: 'Truck details changed successfully',
     });
-    next();
+    await next();
   } catch (err) {
     await res.status(400).json({
       message: `Error: ${err.message}`,
@@ -63,7 +63,7 @@ const deleteTruckById = async (req, res, next) => {
   try {
     await Truck.findByIdAndDelete(req.params.id);
     await res.status(200).json({ message: 'Truck deleted successfully' });
-    next();
+    await next();
   } catch (err) {
     await res.status(400).json({ message: `Error: ${err}` });
   }
@@ -76,7 +76,7 @@ const assignTruckById = async (req, res, next) => {
     truck.assigned_to = req.user._id;
     await truck.save();
     await res.status(200).json({ message: 'Truck assigned successfully' });
-    next();
+    await next();
   } else {
     await res.status(400).json({ message: 'Truck invalid id' });
   }

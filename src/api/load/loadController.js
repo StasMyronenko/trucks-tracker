@@ -31,7 +31,7 @@ const getLoads = async (req, res, next) => {
   ]);
   try {
     await res.status(200).json({ loads });
-    next();
+    await next();
   } catch (err) {
     await res.status(400).json({ message: `Error ${err.message}` });
   }
@@ -53,7 +53,7 @@ const createLoad = async (req, res, next) => {
   });
   await load.save();
   await res.status(200).json({ message: 'Load created successfully' });
-  next();
+  await next();
 };
 
 const getActiveLoad = async (req, res) => {
@@ -94,12 +94,12 @@ const newState = async (req, res, next) => {
 
   await load.save();
   await res.status(200).json({ message: load.state });
-  next();
+  await next();
 };
 
 const getLoadById = async (req, res, next) => {
   await res.status(200).json({ load: await Load.findOne({ _id: req.params.id }) });
-  next();
+  await next();
 };
 
 const updateLoadById = async (req, res, next) => {
@@ -144,14 +144,14 @@ const updateLoadById = async (req, res, next) => {
   await res.status(200).json({
     message: 'Load details changed successfully',
   });
-  next();
+  await next();
 };
 
 const deleteLoadById = async (req, res, next) => {
   // eslint-disable-next-line no-underscore-dangle
   await Load.findOneAndDelete({ created_by: req.user._id, _id: req.params.id, status: 'NEW' });
   await res.status(200).json({ message: 'Load deleted successfully' });
-  next();
+  await next();
 };
 
 const postLoad = async (req, res, next) => {
@@ -196,7 +196,7 @@ const postLoad = async (req, res, next) => {
         message: 'Load posted successfully',
         driver_found: true,
       });
-      next();
+      await next();
     } else {
       load.logs.push({ message: 'Driver was not find', time: (new Date()).toString() });
       await load.save();
@@ -219,7 +219,7 @@ const allInfoLoad = async (req, res, next) => {
   const load = await Load.findById(req.params.id);
   const truck = await Truck.findById(load.assigned_to);
   await res.status(200).json({ load, truck });
-  next();
+  await next();
 };
 
 module.exports = {

@@ -3,9 +3,9 @@ const { User } = require('../api/user/models');
 const isShipper = async (req, res, next) => {
   const user = await User.findOne({ email: req.user.email });
   if (user && user.role === 'SHIPPER') {
-    next();
+    await next();
   } else {
-    res.status(400).json({ message: 'You are not shipper or not authenticated' });
+    await res.status(400).json({ message: 'You are not shipper or not authenticated' });
   }
 };
 

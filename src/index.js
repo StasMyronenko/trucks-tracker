@@ -24,7 +24,7 @@ app.use(morgan('tiny'));
 
 app.use('/api', apiRouter);
 
-const start = async () => {
+const start = () => {
   try {
     app.listen(process.env.PORT);
   } catch (err) {

@@ -18,7 +18,7 @@ async function registerUser(req, res, next) {
     await res.status(400).send({ message: `Error: ${err.message}` });
     return;
   }
-  next();
+  await next();
 }
 
 async function loginUser(req, res, next) {
@@ -35,7 +35,7 @@ async function loginUser(req, res, next) {
       message: 'Success',
       jwt_token: jwtToken,
     });
-    next();
+    await next();
     return;
   }
   await res.status(400).json({ message: 'Invalid password or login' });
@@ -45,7 +45,7 @@ async function forgotPassword(req, res, next) {
   try {
     await sendEmailRestorePassword(req.body.email);
     await res.status(200).json({ message: 'We send message on your email' });
-    next();
+    await next();
   } catch (err) {
     await res.status(400).json({ message: `Error ${err.message}` });
   }
@@ -57,7 +57,7 @@ const restorePassword = async (req, res, next) => {
     user.password = await bcrypt.hash(req.body.newPassword, 10);
     await user.save();
     await res.status(200).json({ message: 'Password saved' });
-    next();
+    await next();
   } catch (err) {
     await res.status(400).json({ message: `Error ${err.message}` });
   }
